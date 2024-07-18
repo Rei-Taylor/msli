@@ -1,0 +1,17 @@
+Match Coldstore with Processing
+UPDATE cold_store_in t1
+INNER JOIN processing_in t2 ON t1.Company = t2.Company
+                      AND t1.Item = t2.Item
+                      AND t1.Size = t2.Size
+                      AND t1.Conversion = t2.Conversion
+                      AND t1.Date = t2.Date
+SET t1.Processing_mc = t2.Total_Kg;
+
+Calculate Exported_kg.
+UPDATE cold_store_in t1
+INNER JOIN (
+  SELECT CSID, SUM(Total_kg) AS TotalAmount
+  FROM export_in
+  GROUP BY CSID
+) AS t2 ON t1.ID = t2.CSID
+SET t1.Exported_kg = t2.TotalAmount;

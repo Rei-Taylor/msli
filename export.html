@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="card mb-3 mt-3">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Filter</h5>
+                </div>
+                <div class="card-body">
+                    <form id="filterForm">
+                        <div class="form-group">
+                            <label for="filterCSID">CSID</label>
+                            <input type="text" class="form-control" id="filterCSID" name="filterCSID">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterSr_No">Sr_No</label>
+                            <input type="number" class="form-control" id="filterSr_No" name="filterSr_No">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterFi_No">Fi_No</label>
+                            <input type="text" class="form-control" id="filterFi_No" name="filterFi_No">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterDate">Date</label>
+                            <input type="date" class="form-control" id="filterDate" name="filterDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterRef_Date">Ref_Date</label>
+                            <input type="date" class="form-control" id="filterRef_Date" name="filterRef_Date">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterCompany">Company</label>
+                            <input type="text" class="form-control" id="filterCompany" name="filterCompany">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterItem">Item</label>
+                            <input type="text" class="form-control" id="filterItem" name="filterItem">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterType">Type</label>
+                            <input type="text" class="form-control" id="filterType" name="filterType">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterSize">Size</label>
+                            <input type="text" class="form-control" id="filterSize" name="filterSize">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterConversion">Conversion</label>
+                            <input type="text" class="form-control" id="filterConversion" name="filterConversion">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterFreezing_Type">Freezing_Type</label>
+                            <input type="text" class="form-control" id="filterFreezing_Type" name="filterFreezing_Type">
+                        </div>
+                        <button type="button" class="btn btn-dark w-100" onclick="filterTable()">Search</button>
+                        <button type="button" class="btn btn-success w-100 mt-2" onclick="downloadExcel()">Download Excel</button>
+                    </form>
+                    <div id="subtotals" class="mt-3">
+                        <h6>Subtotals:</h6>
+                        <p>Total Kg: <span id="subtotalKg">0</span></p>
+                        <p>Total Mc: <span id="subtotalMc">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Export Out</h4>
+                <button class="btn btn-success" onclick="showModal()">Add Entry</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>CSID</th>
+                            <th>Sr_No</th>
+                            <th>Fi_No</th>
+                            <th>Date</th>
+                            <th>Ref_Date</th>
+                            <th>Company</th>
+                            <th>Item</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Conversion</th>
+                            <th>Total_Days</th>
+                            <th>Total_Mc</th>
+                            <th>Total_Kg</th>
+                            <th>Freezing_Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="export-table-body">
+                        <!-- Data will be injected here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding/editing entries -->
+<div class="modal fade" id="entryModal" tabindex="-1" aria-labelledby="entryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="entryModalLabel">Add/Edit Entry</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="entryForm">
+                    <input type="hidden" id="ID" name="ID">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="CSID" class="form-label">CSID</label>
+                                <input type="text" class="form-control" id="CSID" name="CSID" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Sr_No" class="form-label">Sr_No</label>
+                                <input type="text" class="form-control" id="Sr_No" name="Sr_No" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Fi_No" class="form-label">Fi_No</label>
+                                <input type="text" class="form-control" id="Fi_No" name="Fi_No" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="Date" name="Date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Ref_Date" class="form-label">Ref_Date</label>
+                                <input type="date" class="form-control" id="Ref_Date" name="Ref_Date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Company" class="form-label">Company</label>
+                                <input type="text" class="form-control" id="Company" name="Company" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Item" class="form-label">Item</label>
+                                <input type="text" class="form-control" id="Item" name="Item" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="Type" class="form-label">Type</label>
+                                <input type="text" class="form-control" id="Type" name="Type" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Size" class="form-label">Size</label>
+                                <input type="text" class="form-control" id="Size" name="Size" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Conversion" class="form-label">Conversion</label>
+                                <input type="text" class="form-control" id="Conversion" name="Conversion" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Total_Mc" class="form-label">Total_Mc</label>
+                                <input type="text" class="form-control" id="Total_Mc" name="Total_Mc" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="Total_Kg" class="form-label">Total_Kg</label>
+                                <input type="text" class="form-control" id="Total_Kg" name="Total_Kg" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="Freezing_Type" class="form-label">Freezing_Type</label>
+                                <input type="text" class="form-control" id="Freezing_Type" name="Freezing_Type" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="updateExportedKgBtn" type="button" class="btn btn-dark w-100" onclick="saveEntry()">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetchexportData();
+    // Add event listeners for Conversion and Total_Mc inputs
+    document.getElementById('Conversion').addEventListener('input', calculateTotalKg);
+    document.getElementById('Total_Mc').addEventListener('input', calculateTotalKg);
+});
+
+function fetchexportData(filters = {}) {
+        fetch('/api/export_in')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('export-table-body');
+                tbody.innerHTML = '';
+                let subtotalKg = 0;
+                let subtotalMc = 0;
+                data.forEach(row => {
+                    // Apply filters
+                    let match = true;
+                    for (const key in filters) {
+                        if (filters[key] && row[key] !== filters[key]) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        subtotalKg += parseFloat(row.Total_Kg) || 0;
+                        subtotalMc += parseFloat(row.Total_Mc) || 0;
+
+                        const formattedDate = new Date(row.Date).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.ID}</td>
+                            <td>${row.CSID}</td>
+                            <td>${row.Sr_No}</td>
+                            <td>${row.Fi_No}</td>
+                            <td>${formattedDate}</td>
+                            <td>${row.Ref_Date}</td>
+                            <td>${row.Company}</td>
+                            <td>${row.Item}</td>
+                            <td>${row.Type}</td>
+                            <td>${row.Size}</td>
+                            <td>${row.Conversion}</td>
+                            <td>${row.Total_Days}</td>
+                            <td>${row.Total_Mc}</td>
+                            <td>${row.Total_Kg}</td>
+                            <td>${row.Freezing_Type}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary mr-1" onclick="editEntry(${row.ID})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteEntry(${row.ID})">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+
+                document.getElementById('subtotalKg').textContent = subtotalKg.toFixed(2);
+                document.getElementById('subtotalMc').textContent = subtotalMc.toFixed(2);
+            });
+    }
+
+    
+function saveEntry() {
+    const entryForm = document.getElementById('entryForm');
+    const formData = new FormData(entryForm);
+
+    const entry = {
+        ID: formData.get('ID'),
+        CSID: formData.get('CSID'),
+        Sr_No: formData.get('Sr_No'),
+        Fi_No: formData.get('Fi_No'),
+        Date: formData.get('Date'),
+        Ref_Date: formData.get('Ref_Date'),
+        Company: formData.get('Company'),
+        Item: formData.get('Item'),
+        Type: formData.get('Type'),
+        Size: formData.get('Size'),
+        Conversion: formData.get('Conversion'),
+        Total_Days: calculateTotalDays(formData.get('Date'), formData.get('Ref_Date')),
+        Total_Mc: formData.get('Total_Mc'),
+        Total_Kg: formData.get('Total_Kg'),
+        Freezing_Type: formData.get('Freezing_Type')
+    };
+
+    const method = entry.ID ? 'PUT' : 'POST';
+    const url = `/api/export_in${entry.ID ? `/${entry.ID}` : ''}`;
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entry)
+    })
+    .then(response => response.json())
+    .then(data => {
+        fetchexportData();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('entryModal'));
+        modal.hide();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function deleteEntry(id) {
+        fetch(`/api/export_in`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ID: id })
+        })
+        .then(response => response.json())
+        .then(data => fetchexportData())
+        .catch(error => console.error('Error:', error));
+    }
+
+
+function calculateTotalDays(date, refDate) {
+    const dateObj = new Date(date);
+    const refDateObj = new Date(refDate);
+    const timeDiff = Math.abs(dateObj - refDateObj);
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return daysDiff;
+}
+
+function showModal( entry = null ) {
+    const modal = new bootstrap.Modal(document.getElementById('entryModal'));
+        const form = document.getElementById('entryForm');
+
+        if (entry) {
+            form.ID.value = entry.ID;
+            form.CSID.value = entry.CSID;
+            form.Sr_No.value = entry.Sr_No;
+            form.Fi_No.value = entry.Fi_No;
+            form.Date.value = entry.Date.split('T')[0];
+            form.Company.value = entry.Company;
+            form.Item.value = entry.Item;
+            form.Type.value = entry.Type;
+            form.Size.value = entry.Size;
+            form.Conversion.value = entry.Conversion;
+            form.Total_Mc.value = entry.Total_Mc;
+            form.Total_Kg.value = entry.Total_Kg;
+            form.Freezing_Type.value = entry.Freezing_Type;
+        } else {
+            form.reset();
+            form.ID.value = '';
+        }
+
+        modal.show();
+}
+
+function filterTable() {
+    const form = document.getElementById('filterForm');
+        const filters = {
+            CSID: form.filterCSID.value,
+            Sr_No: form.filterSr_No.value,
+            Fi_No: form.filterFi_No.value,
+            Date: form.filterDate.value,
+            Company: form.filterCompany.value,
+            Item: form.filterItem.value,
+            Type: form.filterType.value,
+            Size: form.filterSize.value,
+            Conversion: form.filterConversion.value,
+            Freezing_Type: form.filterFreezing_Type.value
+        };
+        fetchexportData(filters);
+}
+
+function calculateTotalKg() {
+        const conversion = parseFloat(document.getElementById('Conversion').value);
+        const totalMc = parseFloat(document.getElementById('Total_Mc').value);
+        const totalKg = conversion * totalMc;
+        document.getElementById('Total_Kg').value = totalKg ? totalKg.toFixed(2) : '';
+    }
+
+function downloadExcel() {
+    const form = document.getElementById('filterForm');
+    const filters = {
+        Sr_No: form.filterSr_No.value,
+        Company: form.filterCompany.value,
+        Item: form.filterItem.value,
+        Size: form.filterSize.value
+    };
+
+    fetch('/api/export_in')
+        .then(response => response.json())
+        .then(data => {
+            const filteredData = data.filter(row => {
+                return (!filters.Sr_No || row.Sr_No === filters.Sr_No) &&
+                       (!filters.Company || row.Company === filters.Company) &&
+                       (!filters.Item || row.Item === filters.Item) &&
+                       (!filters.Size || row.Size === filters.Size);
+            });
+
+            fetch('/api/download_epexcel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(filteredData)
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'filtered_data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+        });
+    }
+
+    document.getElementById('updateExportedKgBtn').addEventListener('click', function() {
+            fetch('/api/update_exported_kg', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.message === "Exported_kg updated successfully") {
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+
+</script>
+{% endblock %}
