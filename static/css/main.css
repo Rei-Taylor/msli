@@ -1,0 +1,47 @@
+body {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.nav-link {
+    color: #fff;
+}
+
+.nav-link:hover {
+    color: #555;
+
+}
+
+
+.nav-link.active {
+    background-color: #444;
+}
+
+th {
+    position: sticky!important;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+}
+
+.table-responsive {
+    max-height: 750px; /* Adjust the height as needed */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #445; /* Dark background for the sticky header */
+    z-index: 1;
+}
+
+summary {
+    font-weight: bold;
+}
