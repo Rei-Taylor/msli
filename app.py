@@ -365,6 +365,6 @@ def sync_data():
         return jsonify({"message": str(e)}), 500    
 
 
-
 if __name__ == '__main__':
-    serve(app, host='192.168.0.88', port=8088, threads= 6)
+    port = int(os.environ.get('PORT', 8088)) 
+    serve(app, host='0.0.0.0', port=port, threads=6)
