@@ -1,6 +1,5 @@
 pandas
 flask
-xlsx_writer
 waitress
 MySQLdb
 flask_mysqldb
