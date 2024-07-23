@@ -1,5 +1,4 @@
 pandas
 flask
 waitress
-MySQLdb
 flask_mysqldb
